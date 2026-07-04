@@ -22,7 +22,7 @@ jobs:
           CLANG=$(xcrun --sdk iphoneos --find clang)
 
           $CLANG \
-            -shared -fmodules -fobjc-arc \
+            -shared -fobjc-arc \
             -isysroot $SDK \
             -miphoneos-version-min=14.0 \
             -arch arm64 -arch arm64e \
