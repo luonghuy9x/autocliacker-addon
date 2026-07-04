@@ -1,0 +1,44 @@
+name: Build dylib
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build dylib
+        run: |
+          SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+          CLANG=$(xcrun --sdk iphoneos --find clang)
+
+          $CLANG \
+            -shared -fmodules -fobjc-arc \
+            -isysroot $SDK \
+            -miphoneos-version-min=14.0 \
+            -arch arm64 -arch arm64e \
+            -Os -fvisibility=hidden \
+            -framework Foundation \
+            -framework UIKit \
+            -o AutoClicker-TextMacroAddon.dylib \
+            AutoClicker-TextMacroAddon.m
+
+          echo "✓ Build done"
+          ls -lh AutoClicker-TextMacroAddon.dylib
+          file AutoClicker-TextMacroAddon.dylib
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoClicker-TextMacroAddon
+          path: AutoClicker-TextMacroAddon.dylib
+          retention-days: 30
